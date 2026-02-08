@@ -1,0 +1,159 @@
+{
+  "identity": {
+    "name": "E1",
+    "role": "Creative Designer",
+    "mission": "Create a Telegram-native, dark-mode first Taxi MVP that feels premium, efficient, and trustworthy."
+  },
+  "project_scope": {
+    "app_type": "Hybrid Fullstack (Telegram Mini App + Web Admin)",
+    "platforms": [
+      "Mobile (Telegram WebApp)",
+      "Desktop (Admin Panel)"
+    ],
+    "theme_strategy": "Dark Mode First (Telegram Aesthetic)"
+  },
+  "typography": {
+    "font_family": {
+      "primary": "Manrope, sans-serif",
+      "secondary": "JetBrains Mono, monospace",
+      "fallback": "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif"
+    },
+    "usage": {
+      "headings": "Manrope (Weights: 600, 700, 800)",
+      "body": "Manrope (Weights: 400, 500)",
+      "data_display": "JetBrains Mono (IDs, Prices, Coordinates)"
+    },
+    "scale": {
+      "h1": "text-3xl md:text-4xl font-bold tracking-tight",
+      "h2": "text-2xl md:text-3xl font-semibold tracking-tight",
+      "h3": "text-xl font-semibold",
+      "body_lg": "text-lg leading-relaxed",
+      "body_base": "text-base leading-normal",
+      "caption": "text-sm text-muted-foreground"
+    }
+  },
+  "colors": {
+    "palette": {
+      "background": "#0f0f0f",
+      "surface": "#1c1c1e",
+      "surface_highlight": "#2c2c2e",
+      "primary": "#2AABEE",
+      "primary_foreground": "#FFFFFF",
+      "secondary": "#EAB308",
+      "secondary_foreground": "#000000",
+      "destructive": "#EF4444",
+      "success": "#22C55E",
+      "text_primary": "#FFFFFF",
+      "text_secondary": "#A1A1AA",
+      "border": "#27272A"
+    },
+    "usage_rules": {
+      "mini_app_bg": "bg-[#0f0f0f] (Matches Telegram Dark Default)",
+      "admin_bg": "bg-[#09090b] (Deep Zinc)",
+      "cards": "bg-[#1c1c1e] border border-[#2c2c2e]",
+      "primary_action": "bg-[#2AABEE] hover:bg-[#229ED9] text-white shadow-[0_0_15px_rgba(42,171,238,0.3)]",
+      "status_active": "text-[#22C55E] bg-[#22C55E]/10 border-transparent",
+      "status_pending": "text-[#EAB308] bg-[#EAB308]/10 border-transparent",
+      "status_cancelled": "text-[#EF4444] bg-[#EF4444]/10 border-transparent"
+    }
+  },
+  "layout_strategies": {
+    "mini_app": {
+      "container": "w-full min-h-screen flex flex-col bg-background text-foreground overflow-hidden",
+      "padding": "p-4",
+      "components": {
+        "bottom_sheet": "fixed bottom-0 left-0 right-0 bg-surface rounded-t-[20px] p-6 shadow-[0_-4px_20px_rgba(0,0,0,0.4)] z-50 border-t border-white/5",
+        "map_layer": "absolute inset-0 z-0 opacity-60 grayscale-[0.8] invert-[0.9]",
+        "floating_controls": "absolute top-4 right-4 flex flex-col gap-3 z-40"
+      }
+    },
+    "admin_panel": {
+      "container": "flex h-screen bg-background text-foreground overflow-hidden",
+      "sidebar": "w-64 bg-surface border-r border-border flex-shrink-0 hidden md:flex flex-col",
+      "main_content": "flex-1 overflow-y-auto p-8",
+      "grid_system": "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
+    }
+  },
+  "components": {
+    "buttons": {
+      "primary": "h-12 rounded-xl bg-primary text-primary-foreground font-semibold hover:opacity-90 transition-all active:scale-95 shadow-lg shadow-primary/20",
+      "secondary": "h-12 rounded-xl bg-surface_highlight text-white font-medium hover:bg-white/10 transition-all border border-white/5",
+      "ghost": "h-10 rounded-lg hover:bg-white/5 text-text_secondary hover:text-white transition-colors",
+      "icon": "h-10 w-10 rounded-full bg-surface flex items-center justify-center hover:bg-surface_highlight transition-all"
+    },
+    "inputs": {
+      "default": "h-12 bg-surface border-transparent focus:border-primary/50 focus:ring-2 focus:ring-primary/20 rounded-xl text-white placeholder:text-white/30 transition-all",
+      "search": "pl-10 bg-surface_highlight/50 border-none rounded-full"
+    },
+    "cards": {
+      "dashboard": "p-6 rounded-2xl bg-surface border border-white/5 shadow-sm hover:border-white/10 transition-colors",
+      "driver_info": "flex items-center gap-4 p-4 rounded-xl bg-surface_highlight/30 border border-white/5"
+    },
+    "status_badge": "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
+  },
+  "visual_enhancers": {
+    "glassmorphism": "backdrop-blur-xl bg-black/40 border border-white/10",
+    "gradients": {
+      "primary_glow": "bg-gradient-to-r from-primary/20 to-transparent blur-3xl absolute",
+      "surface_shimmer": "bg-gradient-to-br from-white/5 to-transparent"
+    },
+    "shadows": {
+      "neon": "shadow-[0_0_20px_rgba(42,171,238,0.15)]",
+      "deep": "shadow-[0_10px_40px_-10px_rgba(0,0,0,0.5)]"
+    }
+  },
+  "assets": {
+    "images": {
+      "auth_bg": {
+        "url": "https://images.unsplash.com/photo-1693438168230-4f74c886472a?crop=entropy&cs=srgb&fm=jpg&q=85",
+        "alt": "Taxi sign glowing in dark",
+        "usage": "Login screen background with heavy overlay"
+      },
+      "map_placeholder": {
+        "url": "https://images.unsplash.com/photo-1678297152056-1271c6155e0e?crop=entropy&cs=srgb&fm=jpg&q=85",
+        "alt": "Abstract dark city map",
+        "usage": "Background for 'Searching' state or fallback map"
+      },
+      "driver_avatar_placeholder": {
+        "url": "https://api.dicebear.com/7.x/avataaars/svg?seed=Felix",
+        "alt": "Driver Avatar",
+        "usage": "Driver profile picture"
+      }
+    },
+    "icons": {
+      "library": "lucide-react",
+      "preferred_set": [
+        "MapPin",
+        "Navigation",
+        "Clock",
+        "CreditCard",
+        "User",
+        "Shield",
+        "Menu",
+        "X",
+        "ChevronRight",
+        "Phone"
+      ]
+    }
+  },
+  "accessibility": {
+    "contrast": "Ensure text is WCAG AA compliant. Use text-white on dark backgrounds, text-black on primary/secondary colors.",
+    "touch_targets": "Minimum 44x44px for all interactive elements in Mini App.",
+    "focus_states": "Visible focus rings (ring-2 ring-primary) for keyboard navigation in Admin Panel."
+  },
+  "instructions_to_main_agent": [
+    "1. SETUP: Ensure 'lucide-react' and 'clsx' 'tailwind-merge' are installed.",
+    "2. THEME: Force dark mode in 'index.css' by adding the '.dark' class to the html or body tag by default, or ensure the system preference is respected but defaults to dark.",
+    "3. MINI APP LAYOUT: Use a 'fixed' positioning strategy for the bottom sheet to ensure it stays accessible over the map.",
+    "4. ADMIN LAYOUT: Use a persistent sidebar layout. The main content area should be scrollable.",
+    "5. MAP: If no map library is available, use the 'map_placeholder' image as a background with a centered 'MapPin' icon to simulate the experience.",
+    "6. DATA-TESTID: Add 'data-testid' to all buttons, inputs, and major containers (e.g., 'submit-order-btn', 'driver-card').",
+    "7. SHADCN: Customize shadcn components to match the 'rounded-xl' and 'bg-surface' aesthetic defined in 'components' section. Do not use default white cards."
+  ],
+  "universal_guidelines": [
+    "Avoid 'AI Slop': Do not use generic centered layouts. Use asymmetry and hierarchy.",
+    "Micro-interactions: Add 'active:scale-95' to buttons. Add hover states to table rows.",
+    "Spacing: Use 'gap-4' or 'gap-6' for lists. Don't crowd the UI.",
+    "Glassmorphism: Use the 'glassmorphism' class defined in visual_enhancers for overlays (like the ride status panel)."
+  ]
+}
