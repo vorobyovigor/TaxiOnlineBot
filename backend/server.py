@@ -407,6 +407,26 @@ async def telegram_webhook(request: Request):
     data = await request.json()
     logger.info(f"Telegram webhook: {data}")
     
+    # Handle /start command
+    if "message" in data and data["message"].get("text") == "/start":
+        chat_id = data["message"]["chat"]["id"]
+        user = data["message"]["from"]
+        first_name = user.get("first_name", "")
+        
+        welcome_text = f"🚖 Привет, {first_name}!\n\nДобро пожаловать в службу такси.\nНажмите кнопку ниже, чтобы заказать такси:"
+        
+        reply_markup = {
+            "inline_keyboard": [[
+                {
+                    "text": "🚖 Заказать такси",
+                    "web_app": {"url": os.environ.get("WEBAPP_URL", "https://brief-specs-1.preview.emergentagent.com")}
+                }
+            ]]
+        }
+        
+        await send_telegram_message(str(chat_id), welcome_text, reply_markup)
+        return {"ok": True}
+    
     # Handle callback query (button press)
     if "callback_query" in data:
         callback = data["callback_query"]
