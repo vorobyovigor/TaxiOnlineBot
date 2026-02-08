@@ -374,6 +374,7 @@ export default function MiniApp() {
               </Button>
             </form>
           )}
+          </div>
         </div>
       </div>
       
