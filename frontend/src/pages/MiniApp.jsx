@@ -210,15 +210,15 @@ export default function MiniApp() {
       {/* Content */}
       <div className="relative z-10 flex-1 flex flex-col">
         {/* Header */}
-        <div className="p-4">
-          <div className="glass rounded-2xl p-4">
+        <div className="p-4 pb-2">
+          <div className="glass rounded-2xl p-3">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-[#2AABEE] flex items-center justify-center">
-                <Navigation className="w-5 h-5" />
+              <div className="w-9 h-9 rounded-full bg-[#2AABEE] flex items-center justify-center">
+                <Navigation className="w-4 h-4" />
               </div>
               <div>
-                <h1 className="font-bold text-lg">Такси</h1>
-                <p className="text-white/60 text-sm">
+                <h1 className="font-bold">Такси</h1>
+                <p className="text-white/60 text-xs">
                   {user?.first_name ? `Привет, ${user.first_name}!` : "Быстро и удобно"}
                 </p>
               </div>
@@ -226,11 +226,9 @@ export default function MiniApp() {
           </div>
         </div>
         
-        {/* Spacer */}
-        <div className="flex-1" />
-        
-        {/* Bottom Sheet */}
-        <div className="bottom-sheet bg-[#1c1c1e] p-6 animate-slide-up" data-testid="order-panel">
+        {/* Order Panel - сразу под хедером */}
+        <div className="flex-1 px-4 pb-4" data-testid="order-panel">
+          <div className="bg-[#1c1c1e] rounded-2xl p-5 h-full border border-white/5">
           {activeOrder && ["NEW", "BROADCAST", "ASSIGNED"].includes(activeOrder.status) ? (
             // Active order view
             <div className="space-y-4">
