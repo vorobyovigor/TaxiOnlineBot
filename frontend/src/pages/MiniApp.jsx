@@ -35,6 +35,7 @@ export default function MiniApp() {
   // Form state
   const [addressFrom, setAddressFrom] = useState("");
   const [addressTo, setAddressTo] = useState("");
+  const [clientPrice, setClientPrice] = useState("");
   const [comment, setComment] = useState("");
 
   // Initialize Telegram WebApp
