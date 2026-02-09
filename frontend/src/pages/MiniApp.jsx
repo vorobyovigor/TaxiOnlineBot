@@ -500,6 +500,18 @@ export default function MiniApp() {
                   </div>
                 </div>
                 
+                {activeOrder.client_price > 0 && (
+                  <div className="flex items-start gap-3">
+                    <div className="w-8 h-8 rounded-full bg-yellow-500/20 flex items-center justify-center flex-shrink-0">
+                      <Banknote className="w-4 h-4 text-yellow-500" />
+                    </div>
+                    <div>
+                      <p className="text-white/60 text-xs">Моя цена</p>
+                      <p className="font-medium">{activeOrder.client_price} ₽</p>
+                    </div>
+                  </div>
+                )}
+                
                 {activeOrder.comment && (
                   <div className="flex items-start gap-3">
                     <div className="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center flex-shrink-0">
