@@ -32,7 +32,13 @@ export default function AdminDrivers() {
   // Edit dialog
   const [selectedDriver, setSelectedDriver] = useState(null);
   const [showEditDialog, setShowEditDialog] = useState(false);
-  const [editPhone, setEditPhone] = useState("");
+  const [editForm, setEditForm] = useState({
+    phone: "",
+    car_brand: "",
+    car_model: "",
+    car_color: "",
+    car_plate: ""
+  });
 
   const fetchDrivers = async () => {
     try {
