@@ -1,0 +1,51 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:6
+    container_name: taxi-mongodb
+    restart: always
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - taxi-network
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: taxi-backend
+    restart: always
+    environment:
+      - MONGO_URL=mongodb://mongodb:27017
+      - DB_NAME=${DB_NAME:-taxi_db}
+      - CORS_ORIGINS=${CORS_ORIGINS:-*}
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
+      - TELEGRAM_DRIVERS_CHAT_ID=${TELEGRAM_DRIVERS_CHAT_ID}
+      - WEBAPP_URL=${WEBAPP_URL}
+    depends_on:
+      - mongodb
+    networks:
+      - taxi-network
+    ports:
+      - "8001:8001"
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        - REACT_APP_BACKEND_URL=${REACT_APP_BACKEND_URL}
+    container_name: taxi-frontend
+    restart: always
+    networks:
+      - taxi-network
+    ports:
+      - "3000:80"
+
+networks:
+  taxi-network:
+    driver: bridge
+
+volumes:
+  mongodb_data:
