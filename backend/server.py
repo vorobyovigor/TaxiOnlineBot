@@ -397,6 +397,7 @@ async def create_order(order_data: CreateOrderRequest, telegram_id: str = Query(
     order = OrderModel(
         client_id=client_doc["id"],
         client_telegram_id=telegram_id,
+        client_phone=client_doc.get("phone"),
         address_from=order_data.address_from,
         address_to=order_data.address_to,
         comment=order_data.comment
