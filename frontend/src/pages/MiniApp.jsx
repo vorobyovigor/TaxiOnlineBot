@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import axios from "axios";
-import { MapPin, Navigation, MessageSquare, X, Clock, User, Phone, Loader2, CheckCircle, AlertCircle, Smartphone } from "lucide-react";
+import { MapPin, Navigation, MessageSquare, X, Clock, User, Phone, Loader2, CheckCircle, AlertCircle, Smartphone, Banknote } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
