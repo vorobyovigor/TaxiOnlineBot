@@ -719,22 +719,12 @@ async def telegram_webhook(request: Request):
             
             await log_action(ActionType.ORDER_ASSIGNED, order_id=order_id, driver_id=driver["id"])
             
-            # Update message in chat
+            # Delete message from drivers chat
             order = result
-            car_info = f"{driver.get('car_brand', '')} {driver.get('car_model', '')} {driver.get('car_color', '')} ({driver.get('car_plate', '')})".strip()
+            if order.get("telegram_message_id"):
+                await delete_telegram_message(TELEGRAM_DRIVERS_CHAT_ID, order["telegram_message_id"])
             
-            await edit_telegram_message(
-                TELEGRAM_DRIVERS_CHAT_ID,
-                order.get("telegram_message_id"),
-                f"""✅ <b>Заказ принят</b>
-
-📍 <b>Откуда:</b> {order['address_from']}
-📍 <b>Куда:</b> {order['address_to']}
-
-👤 <b>Водитель:</b> {driver_name}
-🚗 <b>Авто:</b> {car_info}
-🆔 Заказ: <code>{order_id[:8]}</code>"""
-            )
+            car_info = f"{driver.get('car_brand', '')} {driver.get('car_model', '')} {driver.get('car_color', '')} ({driver.get('car_plate', '')})".strip()
             
             # Notify client with car info
             client_message = f"""🚖 <b>Водитель назначен!</b>
@@ -749,12 +739,15 @@ async def telegram_webhook(request: Request):
             await answer_callback_query(callback_id, "✅ Вы приняли заказ!")
             
             # Send order details to driver in private
+            client_phone = order.get("client_phone", "")
             driver_message = f"""🚖 <b>Вы приняли заказ!</b>
 
 📍 <b>Откуда:</b> {order['address_from']}
 📍 <b>Куда:</b> {order['address_to']}"""
             if order.get("comment"):
                 driver_message += f"\n💬 <b>Комментарий:</b> {order['comment']}"
+            if client_phone:
+                driver_message += f"\n📞 <b>Телефон клиента:</b> {client_phone}"
             
             driver_message += f"\n\n🆔 Заказ: <code>{order_id[:8]}</code>"
             
