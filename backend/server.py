@@ -240,6 +240,21 @@ async def edit_telegram_message(chat_id: str, message_id: int, text: str, reply_
         response = await http_client.post(url, json=payload)
         return response.json()
 
+async def delete_telegram_message(chat_id: str, message_id: int):
+    """Delete message via Telegram Bot API"""
+    if not TELEGRAM_BOT_TOKEN or not message_id:
+        return None
+    
+    url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/deleteMessage"
+    payload = {
+        "chat_id": chat_id,
+        "message_id": message_id
+    }
+    
+    async with httpx.AsyncClient() as http_client:
+        response = await http_client.post(url, json=payload)
+        return response.json()
+
 async def answer_callback_query(callback_query_id: str, text: str = None, show_alert: bool = False):
     """Answer callback query"""
     if not TELEGRAM_BOT_TOKEN:
