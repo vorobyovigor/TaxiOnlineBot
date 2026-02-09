@@ -29,6 +29,8 @@ export default function MiniApp() {
   const [submitting, setSubmitting] = useState(false);
   const [showCancelDialog, setShowCancelDialog] = useState(false);
   const [requestingPhone, setRequestingPhone] = useState(false);
+  const [manualPhone, setManualPhone] = useState("");
+  const [savingPhone, setSavingPhone] = useState(false);
   
   // Form state
   const [addressFrom, setAddressFrom] = useState("");
