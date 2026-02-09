@@ -935,13 +935,9 @@ async def admin_cancel_order(order_id: str):
     # Notify client
     await notify_client(order["client_telegram_id"], "❌ <b>Ваш заказ отменён администратором</b>")
     
-    # Update message in drivers chat
+    # Delete message from drivers chat
     if order.get("telegram_message_id") and TELEGRAM_DRIVERS_CHAT_ID:
-        await edit_telegram_message(
-            TELEGRAM_DRIVERS_CHAT_ID,
-            order["telegram_message_id"],
-            f"❌ <b>Заказ отменён администратором</b>\n\n🆔 Заказ: <code>{order_id[:8]}</code>"
-        )
+        await delete_telegram_message(TELEGRAM_DRIVERS_CHAT_ID, order["telegram_message_id"])
     
     return {"success": True, "message": "Заказ отменён"}
 
