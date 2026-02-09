@@ -141,6 +141,7 @@ class AdminModel(BaseModel):
 class CreateOrderRequest(BaseModel):
     address_from: str
     address_to: str
+    client_price: int
     comment: Optional[str] = None
 
 class UpdateClientPhoneRequest(BaseModel):
