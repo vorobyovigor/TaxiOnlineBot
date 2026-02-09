@@ -375,6 +375,14 @@ async def create_order(order_data: CreateOrderRequest, telegram_id: str = Query(
     """Create new order"""
     logger.info(f"Create order request from telegram_id: {telegram_id}")
     
+    # Get client - must exist with phone
+    client_doc = await db.clients.find_one({"telegram_id": telegram_id}, {"_id": 0})
+    if not client_doc:
+        raise HTTPException(status_code=404, detail="Клиент не найден. Пожалуйста, предоставьте номер телефона.")
+    
+    if not client_doc.get("phone"):
+        raise HTTPException(status_code=400, detail="Для заказа необходимо предоставить номер телефона")
+    
     # Check if client has active order
     active_order = await db.orders.find_one({
         "client_telegram_id": telegram_id,
@@ -383,15 +391,6 @@ async def create_order(order_data: CreateOrderRequest, telegram_id: str = Query(
     
     if active_order:
         raise HTTPException(status_code=400, detail="У вас уже есть активный заказ")
-    
-    # Get or create client
-    client_doc = await db.clients.find_one({"telegram_id": telegram_id}, {"_id": 0})
-    if not client_doc:
-        # Auto-create client if not exists
-        logger.info(f"Auto-creating client: {telegram_id}")
-        new_client = ClientModel(telegram_id=telegram_id)
-        await db.clients.insert_one(new_client.model_dump())
-        client_doc = new_client.model_dump()
     
     # Create order
     order = OrderModel(
