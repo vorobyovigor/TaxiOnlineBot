@@ -438,6 +438,69 @@ async def telegram_webhook(request: Request):
         await send_telegram_message(str(chat_id), welcome_text, reply_markup)
         return {"ok": True}
     
+    # Handle text messages (for driver registration)
+    if "message" in data and "text" in data["message"]:
+        chat_id = data["message"]["chat"]["id"]
+        text = data["message"]["text"]
+        user = data["message"]["from"]
+        telegram_id = str(user["id"])
+        
+        # Check if driver is in registration process
+        driver = await db.drivers.find_one({"telegram_id": telegram_id}, {"_id": 0})
+        
+        if driver and driver.get("registration_step"):
+            step = driver["registration_step"]
+            
+            if step == "car_brand":
+                await db.drivers.update_one(
+                    {"telegram_id": telegram_id},
+                    {"$set": {"car_brand": text, "registration_step": "car_model"}}
+                )
+                await send_telegram_message(telegram_id, "🚗 Введите модель автомобиля:")
+                return {"ok": True}
+            
+            elif step == "car_model":
+                await db.drivers.update_one(
+                    {"telegram_id": telegram_id},
+                    {"$set": {"car_model": text, "registration_step": "car_color"}}
+                )
+                await send_telegram_message(telegram_id, "🎨 Введите цвет автомобиля:")
+                return {"ok": True}
+            
+            elif step == "car_color":
+                await db.drivers.update_one(
+                    {"telegram_id": telegram_id},
+                    {"$set": {"car_color": text, "registration_step": "car_plate"}}
+                )
+                await send_telegram_message(telegram_id, "🔢 Введите гос. номер автомобиля:")
+                return {"ok": True}
+            
+            elif step == "car_plate":
+                await db.drivers.update_one(
+                    {"telegram_id": telegram_id},
+                    {"$set": {
+                        "car_plate": text.upper(),
+                        "registration_step": None,
+                        "is_registered": True
+                    }}
+                )
+                
+                # Get updated driver info
+                updated_driver = await db.drivers.find_one({"telegram_id": telegram_id}, {"_id": 0})
+                
+                await send_telegram_message(
+                    telegram_id,
+                    f"✅ Регистрация завершена!\n\n"
+                    f"🚗 Ваш автомобиль:\n"
+                    f"• Марка: {updated_driver['car_brand']}\n"
+                    f"• Модель: {updated_driver['car_model']}\n"
+                    f"• Цвет: {updated_driver['car_color']}\n"
+                    f"• Гос. номер: {updated_driver['car_plate']}\n\n"
+                    f"Теперь вы можете принимать заказы в группе водителей!"
+                )
+                await log_action(ActionType.DRIVER_REGISTERED, driver_id=updated_driver["id"])
+                return {"ok": True}
+    
     # Handle callback query (button press)
     if "callback_query" in data:
         callback = data["callback_query"]
