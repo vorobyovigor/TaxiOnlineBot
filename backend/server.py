@@ -141,6 +141,10 @@ class CreateOrderRequest(BaseModel):
     address_to: str
     comment: Optional[str] = None
 
+class UpdateClientPhoneRequest(BaseModel):
+    telegram_id: str
+    phone: str
+
 class TelegramInitData(BaseModel):
     init_data: str
 
