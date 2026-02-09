@@ -48,26 +48,44 @@ export default function MiniApp() {
       setLoading(true);
       
       let telegramId = null;
+      let userData = null;
       
       if (tg?.initDataUnsafe?.user?.id) {
         telegramId = String(tg.initDataUnsafe.user.id);
         
         // Auth with backend
-        const authRes = await axios.post(`${API}/client/auth`, {
-          init_data: tg.initData || ""
-        });
-        setUser(authRes.data);
+        try {
+          const authRes = await axios.post(`${API}/client/auth`, {
+            init_data: tg.initData || ""
+          });
+          userData = authRes.data;
+        } catch (authError) {
+          console.error("Auth error:", authError);
+          // Use data from Telegram directly
+          userData = {
+            telegram_id: telegramId,
+            first_name: tg.initDataUnsafe.user.first_name,
+            last_name: tg.initDataUnsafe.user.last_name,
+            username: tg.initDataUnsafe.user.username
+          };
+        }
       } else {
         // Demo mode for testing outside Telegram
         telegramId = "demo_user_123";
-        setUser({ telegram_id: telegramId, first_name: "Demo User" });
+        userData = { telegram_id: telegramId, first_name: "Demo User" };
       }
       
+      setUser(userData);
+      
       // Fetch active order
-      const orderRes = await axios.get(`${API}/client/order/active`, {
-        params: { telegram_id: telegramId }
-      });
-      setActiveOrder(orderRes.data);
+      try {
+        const orderRes = await axios.get(`${API}/client/order/active`, {
+          params: { telegram_id: telegramId }
+        });
+        setActiveOrder(orderRes.data);
+      } catch (orderError) {
+        console.error("Order fetch error:", orderError);
+      }
       
     } catch (error) {
       console.error("Init error:", error);
