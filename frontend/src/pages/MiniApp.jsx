@@ -568,6 +568,18 @@ export default function MiniApp() {
                 </div>
                 
                 <div className="relative">
+                  <Banknote className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-yellow-500" />
+                  <Input
+                    type="number"
+                    placeholder="Моя цена (₽)"
+                    value={clientPrice}
+                    onChange={(e) => setClientPrice(e.target.value)}
+                    className="pl-11 h-12 bg-[#2c2c2e] border-transparent focus:border-[#2AABEE]/50 rounded-xl"
+                    data-testid="client-price-input"
+                  />
+                </div>
+                
+                <div className="relative">
                   <MessageSquare className="absolute left-3 top-3 w-5 h-5 text-white/40" />
                   <Textarea
                     placeholder="Комментарий (необязательно)"
@@ -581,7 +593,7 @@ export default function MiniApp() {
               
               <Button
                 type="submit"
-                disabled={submitting || !addressFrom.trim() || !addressTo.trim()}
+                disabled={submitting || !addressFrom.trim() || !addressTo.trim() || !clientPrice}
                 className="w-full h-12 rounded-xl bg-[#2AABEE] hover:bg-[#229ED9] text-white font-semibold shadow-lg shadow-[#2AABEE]/20 active:scale-95 transition-all"
                 data-testid="submit-order-btn"
               >
