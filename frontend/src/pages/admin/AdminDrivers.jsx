@@ -177,6 +177,33 @@ export default function AdminDrivers() {
                     {driver.phone || "Не указан"}
                   </span>
                 </div>
+                {driver.is_registered && driver.car_brand && (
+                  <div className="flex items-center gap-2 text-sm">
+                    <Car className="w-4 h-4 text-white/40" />
+                    <span className="text-white">
+                      {driver.car_brand} {driver.car_model} {driver.car_color}
+                    </span>
+                  </div>
+                )}
+                {driver.is_registered && driver.car_plate && (
+                  <div className="flex items-center gap-2 text-sm">
+                    <span className="w-4 h-4 text-white/40 text-center">🔢</span>
+                    <span className="text-white font-mono">{driver.car_plate}</span>
+                  </div>
+                )}
+                <div className="flex items-center gap-2 text-sm">
+                  {driver.is_registered ? (
+                    <>
+                      <CheckCircle className="w-4 h-4 text-green-500" />
+                      <span className="text-green-500">Зарегистрирован</span>
+                    </>
+                  ) : (
+                    <>
+                      <XCircle className="w-4 h-4 text-yellow-500" />
+                      <span className="text-yellow-500">Не завершил регистрацию</span>
+                    </>
+                  )}
+                </div>
                 <div className="flex items-center gap-2 text-sm">
                   <span className={`w-2 h-2 rounded-full ${
                     driver.is_busy ? "bg-yellow-500" : "bg-green-500"
