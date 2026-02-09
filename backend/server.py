@@ -154,6 +154,10 @@ class AdminLoginRequest(BaseModel):
 class UpdateDriverRequest(BaseModel):
     status: Optional[DriverStatus] = None
     phone: Optional[str] = None
+    car_brand: Optional[str] = None
+    car_model: Optional[str] = None
+    car_color: Optional[str] = None
+    car_plate: Optional[str] = None
 
 class AssignDriverRequest(BaseModel):
     driver_id: str
