@@ -107,6 +107,7 @@ class OrderModel(BaseModel):
     driver_telegram_id: Optional[str] = None
     driver_name: Optional[str] = None
     driver_phone: Optional[str] = None
+    driver_car: Optional[str] = None  # Информация об автомобиле
     telegram_message_id: Optional[int] = None
     created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
     assigned_at: Optional[str] = None
