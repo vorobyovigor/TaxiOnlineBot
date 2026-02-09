@@ -419,6 +419,58 @@ async def telegram_webhook(request: Request):
     data = await request.json()
     logger.info(f"Telegram webhook: {data}")
     
+    # Handle new member in drivers chat
+    if "message" in data and "new_chat_members" in data["message"]:
+        chat_id = data["message"]["chat"]["id"]
+        
+        # Check if this is the drivers chat
+        if str(chat_id) == TELEGRAM_DRIVERS_CHAT_ID:
+            for new_member in data["message"]["new_chat_members"]:
+                if new_member.get("is_bot"):
+                    continue  # Skip bots
+                
+                telegram_id = str(new_member["id"])
+                
+                # Check if driver already exists
+                existing_driver = await db.drivers.find_one({"telegram_id": telegram_id}, {"_id": 0})
+                
+                if not existing_driver:
+                    # Create new driver
+                    driver = DriverModel(
+                        telegram_id=telegram_id,
+                        username=new_member.get("username"),
+                        first_name=new_member.get("first_name"),
+                        last_name=new_member.get("last_name"),
+                        is_registered=False,
+                        registration_step="car_brand"
+                    )
+                    await db.drivers.insert_one(driver.model_dump())
+                    
+                    # Send welcome message to driver in private
+                    first_name = new_member.get("first_name", "")
+                    await send_telegram_message(
+                        telegram_id,
+                        f"🚕 Привет, {first_name}!\n\n"
+                        f"Добро пожаловать в команду водителей такси!\n\n"
+                        f"Для начала работы необходимо заполнить данные об автомобиле.\n\n"
+                        f"🚗 Введите марку автомобиля (например: Toyota, Hyundai, Kia):"
+                    )
+                elif not existing_driver.get("is_registered"):
+                    # Driver exists but not registered - remind them
+                    if not existing_driver.get("registration_step"):
+                        await db.drivers.update_one(
+                            {"telegram_id": telegram_id},
+                            {"$set": {"registration_step": "car_brand"}}
+                        )
+                    
+                    await send_telegram_message(
+                        telegram_id,
+                        "🚕 Вы ещё не завершили регистрацию!\n\n"
+                        "🚗 Введите марку автомобиля:"
+                    )
+        
+        return {"ok": True}
+    
     # Handle /start command
     if "message" in data and data["message"].get("text") == "/start":
         chat_id = data["message"]["chat"]["id"]
