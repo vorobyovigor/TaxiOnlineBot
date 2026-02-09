@@ -339,7 +339,37 @@ async def client_auth(data: TelegramInitData):
         logger.warning("No telegram_id in init_data, using demo mode")
         raise HTTPException(status_code=400, detail="Invalid init data")
     
-    # Find or create client
+    # Check if user is a registered driver - sync their data
+    driver = await db.drivers.find_one({"telegram_id": telegram_id}, {"_id": 0})
+    
+    if driver and driver.get("is_registered"):
+        # Driver is registered - create/update client with driver's phone
+        existing_client = await db.clients.find_one({"telegram_id": telegram_id}, {"_id": 0})
+        
+        if existing_client:
+            # Update client with driver's phone if not set
+            if not existing_client.get("phone") and driver.get("phone"):
+                await db.clients.update_one(
+                    {"telegram_id": telegram_id},
+                    {"$set": {"phone": driver.get("phone")}}
+                )
+                existing_client["phone"] = driver.get("phone")
+            logger.info(f"Driver-client found: {telegram_id}")
+            return existing_client
+        else:
+            # Create new client with driver's data
+            new_client = ClientModel(
+                telegram_id=telegram_id,
+                username=driver.get("username") or user_data.get("username"),
+                first_name=driver.get("first_name") or user_data.get("first_name"),
+                last_name=driver.get("last_name") or user_data.get("last_name"),
+                phone=driver.get("phone")  # Use driver's phone
+            )
+            await db.clients.insert_one(new_client.model_dump())
+            logger.info(f"New client created from driver: {telegram_id}")
+            return new_client.model_dump()
+    
+    # Regular client flow
     existing = await db.clients.find_one({"telegram_id": telegram_id}, {"_id": 0})
     
     if existing:
