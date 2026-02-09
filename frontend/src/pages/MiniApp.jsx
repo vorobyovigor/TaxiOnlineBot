@@ -235,12 +235,18 @@ export default function MiniApp() {
       return;
     }
     
+    if (!clientPrice || parseInt(clientPrice) <= 0) {
+      toast.error("Укажите вашу цену за поездку");
+      return;
+    }
+    
     try {
       setSubmitting(true);
       
       const res = await axios.post(`${API}/client/order`, {
         address_from: addressFrom.trim(),
         address_to: addressTo.trim(),
+        client_price: parseInt(clientPrice),
         comment: comment.trim() || null
       }, {
         params: { telegram_id: user.telegram_id }
@@ -249,6 +255,7 @@ export default function MiniApp() {
       setActiveOrder(res.data);
       setAddressFrom("");
       setAddressTo("");
+      setClientPrice("");
       setComment("");
       toast.success("Заказ создан! Ищем водителя...");
       
