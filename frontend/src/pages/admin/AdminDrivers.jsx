@@ -265,25 +265,72 @@ export default function AdminDrivers() {
         </div>
       )}
       
-      {/* Edit Phone Dialog */}
+      {/* Edit Driver Dialog */}
       <Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>
-        <DialogContent className="bg-[#1c1c1e] border-white/10 max-w-sm">
+        <DialogContent className="bg-[#1c1c1e] border-white/10 max-w-md">
           <DialogHeader>
-            <DialogTitle>Редактирование телефона</DialogTitle>
+            <DialogTitle>Редактирование профиля водителя</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
             <div>
-              <label className="text-sm text-white/60 mb-2 block">Номер телефона</label>
+              <label className="text-sm text-white/60 mb-2 block">Телефон</label>
               <Input
                 placeholder="+7 999 123 45 67"
-                value={editPhone}
-                onChange={(e) => setEditPhone(e.target.value)}
+                value={editForm.phone}
+                onChange={(e) => setEditForm({...editForm, phone: e.target.value})}
                 className="bg-[#2c2c2e] border-white/10"
                 data-testid="edit-phone-input"
               />
             </div>
             
-            <div className="flex gap-3">
+            <div className="border-t border-white/10 pt-4">
+              <p className="text-sm text-white/60 mb-3">Данные автомобиля</p>
+              
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-xs text-white/40 mb-1 block">Марка</label>
+                  <Input
+                    placeholder="Toyota"
+                    value={editForm.car_brand}
+                    onChange={(e) => setEditForm({...editForm, car_brand: e.target.value})}
+                    className="bg-[#2c2c2e] border-white/10"
+                    data-testid="edit-car-brand-input"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs text-white/40 mb-1 block">Модель</label>
+                  <Input
+                    placeholder="Camry"
+                    value={editForm.car_model}
+                    onChange={(e) => setEditForm({...editForm, car_model: e.target.value})}
+                    className="bg-[#2c2c2e] border-white/10"
+                    data-testid="edit-car-model-input"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs text-white/40 mb-1 block">Цвет</label>
+                  <Input
+                    placeholder="Белый"
+                    value={editForm.car_color}
+                    onChange={(e) => setEditForm({...editForm, car_color: e.target.value})}
+                    className="bg-[#2c2c2e] border-white/10"
+                    data-testid="edit-car-color-input"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs text-white/40 mb-1 block">Гос. номер</label>
+                  <Input
+                    placeholder="А123БВ777"
+                    value={editForm.car_plate}
+                    onChange={(e) => setEditForm({...editForm, car_plate: e.target.value})}
+                    className="bg-[#2c2c2e] border-white/10 uppercase"
+                    data-testid="edit-car-plate-input"
+                  />
+                </div>
+              </div>
+            </div>
+            
+            <div className="flex gap-3 pt-2">
               <Button
                 variant="outline"
                 className="flex-1"
@@ -293,8 +340,8 @@ export default function AdminDrivers() {
               </Button>
               <Button
                 className="flex-1 bg-[#2AABEE] hover:bg-[#229ED9]"
-                onClick={handleUpdatePhone}
-                data-testid="save-phone-btn"
+                onClick={handleUpdateDriver}
+                data-testid="save-driver-btn"
               >
                 Сохранить
               </Button>
