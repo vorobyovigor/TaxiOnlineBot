@@ -419,6 +419,40 @@ async def update_client_phone(data: UpdateClientPhoneRequest):
         logger.info(f"New client created with phone: {telegram_id} -> {phone}")
         return new_client.model_dump()
 
+@api_router.get("/client/check-phone")
+async def check_client_phone(telegram_id: str = Query(...)):
+    """Check if client has phone number"""
+    # First check if user is a registered driver
+    driver = await db.drivers.find_one({"telegram_id": telegram_id}, {"_id": 0})
+    
+    if driver and driver.get("is_registered") and driver.get("phone"):
+        # Driver has phone - create/update client
+        client_doc = await db.clients.find_one({"telegram_id": telegram_id}, {"_id": 0})
+        if not client_doc:
+            new_client = ClientModel(
+                telegram_id=telegram_id,
+                phone=driver.get("phone"),
+                first_name=driver.get("first_name"),
+                last_name=driver.get("last_name"),
+                username=driver.get("username")
+            )
+            await db.clients.insert_one(new_client.model_dump())
+        elif not client_doc.get("phone"):
+            await db.clients.update_one(
+                {"telegram_id": telegram_id},
+                {"$set": {"phone": driver.get("phone")}}
+            )
+        
+        return {"has_phone": True, "phone": driver.get("phone")}
+    
+    # Check client's phone
+    client_doc = await db.clients.find_one({"telegram_id": telegram_id}, {"_id": 0})
+    
+    if client_doc and client_doc.get("phone"):
+        return {"has_phone": True, "phone": client_doc.get("phone")}
+    
+    return {"has_phone": False, "phone": None}
+
 @api_router.post("/client/order")
 async def create_order(order_data: CreateOrderRequest, telegram_id: str = Query(...)):
     """Create new order"""
