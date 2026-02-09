@@ -61,23 +61,36 @@ export default function MiniApp() {
             init_data: tg.initData || ""
           });
           userData = authRes.data;
+          
+          // Check if phone is required
+          if (!userData.phone) {
+            setNeedsPhone(true);
+            setUser(userData);
+            setLoading(false);
+            return;
+          }
         } catch (authError) {
           console.error("Auth error:", authError);
-          // Use data from Telegram directly
+          // Use data from Telegram directly - but require phone
           userData = {
             telegram_id: telegramId,
             first_name: tg.initDataUnsafe.user.first_name,
             last_name: tg.initDataUnsafe.user.last_name,
             username: tg.initDataUnsafe.user.username
           };
+          setNeedsPhone(true);
+          setUser(userData);
+          setLoading(false);
+          return;
         }
       } else {
         // Demo mode for testing outside Telegram
         telegramId = "demo_user_123";
-        userData = { telegram_id: telegramId, first_name: "Demo User" };
+        userData = { telegram_id: telegramId, first_name: "Demo User", phone: "+7 999 123 4567" };
       }
       
       setUser(userData);
+      setNeedsPhone(false);
       
       // Fetch active order
       try {
@@ -92,11 +105,68 @@ export default function MiniApp() {
     } catch (error) {
       console.error("Init error:", error);
       // Demo mode fallback
-      setUser({ telegram_id: "demo_user_123", first_name: "Demo User" });
+      setUser({ telegram_id: "demo_user_123", first_name: "Demo User", phone: "+7 999 123 4567" });
     } finally {
       setLoading(false);
     }
   }, []);
+
+  // Request phone number from Telegram
+  const requestPhone = useCallback(async () => {
+    setRequestingPhone(true);
+    
+    try {
+      if (tg?.requestContact) {
+        // Use Telegram's requestContact method
+        tg.requestContact((success, event) => {
+          if (success && event?.responseUnsafe?.contact?.phone_number) {
+            const phone = event.responseUnsafe.contact.phone_number;
+            savePhone(phone);
+          } else {
+            toast.error("Не удалось получить номер телефона");
+            setRequestingPhone(false);
+          }
+        });
+      } else {
+        toast.error("Функция недоступна вне Telegram");
+        setRequestingPhone(false);
+      }
+    } catch (error) {
+      console.error("Request phone error:", error);
+      toast.error("Ошибка при запросе номера телефона");
+      setRequestingPhone(false);
+    }
+  }, []);
+
+  // Save phone to backend
+  const savePhone = async (phone) => {
+    try {
+      const telegramId = user?.telegram_id || String(tg?.initDataUnsafe?.user?.id);
+      
+      const res = await axios.post(`${API}/client/update-phone`, {
+        telegram_id: telegramId,
+        phone: phone
+      });
+      
+      setUser(res.data);
+      setNeedsPhone(false);
+      toast.success("Номер телефона сохранён!");
+      
+      // Fetch active order
+      try {
+        const orderRes = await axios.get(`${API}/client/order/active`, {
+          params: { telegram_id: telegramId }
+        });
+        setActiveOrder(orderRes.data);
+      } catch (e) {}
+      
+    } catch (error) {
+      console.error("Save phone error:", error);
+      toast.error("Ошибка сохранения номера");
+    } finally {
+      setRequestingPhone(false);
+    }
+  };
 
   useEffect(() => {
     initialize();
