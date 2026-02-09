@@ -167,7 +167,27 @@ export default function MiniApp() {
       toast.error("Ошибка сохранения номера");
     } finally {
       setRequestingPhone(false);
+      setSavingPhone(false);
     }
+  };
+
+  // Save manually entered phone
+  const handleSaveManualPhone = async () => {
+    const phone = manualPhone.trim();
+    if (!phone) {
+      toast.error("Введите номер телефона");
+      return;
+    }
+    
+    // Basic validation
+    const cleanPhone = phone.replace(/[\s\-\(\)]/g, '');
+    if (cleanPhone.length < 10) {
+      toast.error("Введите корректный номер телефона");
+      return;
+    }
+    
+    setSavingPhone(true);
+    await savePhone(phone);
   };
 
   useEffect(() => {
