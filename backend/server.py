@@ -284,12 +284,10 @@ async def broadcast_order_to_drivers(order: OrderModel):
 
 📍 <b>Откуда:</b> {order.address_from}
 📍 <b>Куда:</b> {order.address_to}
+💰 <b>Цена клиента:</b> {order.client_price} ₽
 """
     if order.comment:
         text += f"💬 <b>Комментарий:</b> {order.comment}\n"
-    
-    if order.client_phone:
-        text += f"📞 <b>Телефон клиента:</b> {order.client_phone}\n"
     
     text += f"\n🆔 Заказ: <code>{order.id[:8]}</code>"
     
