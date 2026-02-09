@@ -351,69 +351,34 @@ export default function MiniApp() {
             </div>
             
             {/* Title */}
-            <h1 className="text-lg font-bold text-center mb-2">Нужен номер телефона</h1>
+            <h1 className="text-lg font-bold text-center mb-2">Подтверждение номера</h1>
             <p className="text-white/60 text-sm text-center mb-6">
-              Для заказа такси укажите ваш номер телефона
+              Для заказа такси необходимо подтвердить ваш номер телефона через Telegram
             </p>
             
-            {/* Manual phone input */}
-            <div className="space-y-4">
-              <div className="relative">
-                <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-white/40" />
-                <Input
-                  type="tel"
-                  placeholder="+7 999 123 45 67"
-                  value={manualPhone}
-                  onChange={(e) => setManualPhone(e.target.value)}
-                  className="pl-11 h-12 bg-[#2c2c2e] border-transparent focus:border-[#2AABEE]/50 rounded-xl"
-                  data-testid="phone-input"
-                />
-              </div>
-              
-              <Button
-                onClick={handleSaveManualPhone}
-                disabled={savingPhone || !manualPhone.trim()}
-                className="w-full h-12 rounded-xl bg-[#2AABEE] hover:bg-[#229ED9] text-white font-semibold shadow-lg shadow-[#2AABEE]/20 active:scale-95 transition-all"
-                data-testid="save-phone-btn"
-              >
-                {savingPhone ? (
-                  <>
-                    <Loader2 className="w-5 h-5 animate-spin mr-2" />
-                    Сохранение...
-                  </>
-                ) : (
-                  "Сохранить и продолжить"
-                )}
-              </Button>
-              
-              {/* Telegram button as alternative */}
-              {tg?.requestContact && (
+            {/* Telegram request button */}
+            <Button
+              onClick={requestPhone}
+              disabled={requestingPhone}
+              className="w-full h-12 rounded-xl bg-[#2AABEE] hover:bg-[#229ED9] text-white font-semibold shadow-lg shadow-[#2AABEE]/20 active:scale-95 transition-all"
+              data-testid="request-phone-btn"
+            >
+              {requestingPhone ? (
                 <>
-                  <div className="flex items-center gap-3 my-4">
-                    <div className="flex-1 h-px bg-white/10" />
-                    <span className="text-white/40 text-xs">или</span>
-                    <div className="flex-1 h-px bg-white/10" />
-                  </div>
-                  
-                  <Button
-                    variant="outline"
-                    onClick={requestPhone}
-                    disabled={requestingPhone}
-                    className="w-full h-12 rounded-xl border-white/10 hover:bg-white/5"
-                    data-testid="request-phone-btn"
-                  >
-                    {requestingPhone ? (
-                      <>
-                        <Loader2 className="w-5 h-5 animate-spin mr-2" />
-                        Запрос...
-                      </>
-                    ) : (
-                      "Отправить номер из Telegram"
-                    )}
-                  </Button>
+                  <Loader2 className="w-5 h-5 animate-spin mr-2" />
+                  Запрос...
+                </>
+              ) : (
+                <>
+                  <Phone className="w-5 h-5 mr-2" />
+                  Подтвердить номер телефона
                 </>
               )}
-            </div>
+            </Button>
+            
+            <p className="text-white/40 text-xs text-center mt-4">
+              Нажмите кнопку и подтвердите отправку номера в Telegram
+            </p>
           </div>
         </div>
       </div>
