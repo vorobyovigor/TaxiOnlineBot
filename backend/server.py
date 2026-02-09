@@ -82,6 +82,13 @@ class DriverModel(BaseModel):
     first_name: Optional[str] = None
     last_name: Optional[str] = None
     phone: Optional[str] = None
+    # Данные автомобиля
+    car_brand: Optional[str] = None
+    car_model: Optional[str] = None
+    car_color: Optional[str] = None
+    car_plate: Optional[str] = None
+    is_registered: bool = False  # Полностью зарегистрирован с данными авто
+    registration_step: Optional[str] = None  # Текущий шаг регистрации
     status: DriverStatus = DriverStatus.ACTIVE
     is_busy: bool = False
     current_order_id: Optional[str] = None
