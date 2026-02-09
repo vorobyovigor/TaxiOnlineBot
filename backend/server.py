@@ -337,6 +337,39 @@ async def client_auth(data: TelegramInitData):
     logger.info(f"New client created: {telegram_id}")
     return new_client.model_dump()
 
+@api_router.post("/client/update-phone")
+async def update_client_phone(data: UpdateClientPhoneRequest):
+    """Update client phone number"""
+    telegram_id = data.telegram_id
+    phone = data.phone
+    
+    # Format phone number
+    phone = phone.strip()
+    if not phone.startswith("+"):
+        phone = "+" + phone
+    
+    # Find or create client
+    client_doc = await db.clients.find_one({"telegram_id": telegram_id}, {"_id": 0})
+    
+    if client_doc:
+        # Update existing client
+        await db.clients.update_one(
+            {"telegram_id": telegram_id},
+            {"$set": {"phone": phone}}
+        )
+        client_doc["phone"] = phone
+        logger.info(f"Client phone updated: {telegram_id} -> {phone}")
+        return client_doc
+    else:
+        # Create new client with phone
+        new_client = ClientModel(
+            telegram_id=telegram_id,
+            phone=phone
+        )
+        await db.clients.insert_one(new_client.model_dump())
+        logger.info(f"New client created with phone: {telegram_id} -> {phone}")
+        return new_client.model_dump()
+
 @api_router.post("/client/order")
 async def create_order(order_data: CreateOrderRequest, telegram_id: str = Query(...)):
     """Create new order"""
