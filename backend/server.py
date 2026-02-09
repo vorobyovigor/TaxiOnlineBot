@@ -560,6 +560,9 @@ async def telegram_webhook(request: Request):
                 return {"ok": True}
             
             # Try to assign order (with lock)
+            driver_name = f"{driver.get('first_name', '')} {driver.get('last_name', '')}".strip() or driver.get("username", "Водитель")
+            car_info = f"{driver.get('car_brand', '')} {driver.get('car_model', '')} {driver.get('car_color', '')} ({driver.get('car_plate', '')})".strip()
+            
             result = await db.orders.find_one_and_update(
                 {
                     "id": order_id,
@@ -570,8 +573,9 @@ async def telegram_webhook(request: Request):
                     "status": OrderStatus.ASSIGNED,
                     "driver_id": driver["id"],
                     "driver_telegram_id": telegram_id,
-                    "driver_name": f"{driver.get('first_name', '')} {driver.get('last_name', '')}".strip() or driver.get("username", "Водитель"),
+                    "driver_name": driver_name,
                     "driver_phone": driver.get("phone"),
+                    "driver_car": car_info,
                     "assigned_at": datetime.now(timezone.utc).isoformat()
                 }},
                 return_document=True
