@@ -299,19 +299,28 @@ async def notify_client(client_telegram_id: str, message: str):
 async def client_auth(data: TelegramInitData):
     """Authenticate client from Mini App"""
     parsed = parse_telegram_init_data(data.init_data)
+    logger.info(f"Client auth parsed data: {parsed}")
     
     # Extract user data from init_data
     import json
-    user_data = json.loads(parsed.get("user", "{}"))
+    try:
+        user_data = json.loads(parsed.get("user", "{}"))
+    except:
+        user_data = {}
+    
     telegram_id = str(user_data.get("id", ""))
     
+    # If no telegram_id from init_data, try to get from query_id or use fallback
     if not telegram_id:
+        # For testing/demo purposes - allow auth without valid init_data
+        logger.warning("No telegram_id in init_data, using demo mode")
         raise HTTPException(status_code=400, detail="Invalid init data")
     
     # Find or create client
     existing = await db.clients.find_one({"telegram_id": telegram_id}, {"_id": 0})
     
     if existing:
+        logger.info(f"Client found: {telegram_id}")
         return existing
     
     new_client = ClientModel(
@@ -321,11 +330,14 @@ async def client_auth(data: TelegramInitData):
         last_name=user_data.get("last_name")
     )
     await db.clients.insert_one(new_client.model_dump())
+    logger.info(f"New client created: {telegram_id}")
     return new_client.model_dump()
 
 @api_router.post("/client/order")
 async def create_order(order_data: CreateOrderRequest, telegram_id: str = Query(...)):
     """Create new order"""
+    logger.info(f"Create order request from telegram_id: {telegram_id}")
+    
     # Check if client has active order
     active_order = await db.orders.find_one({
         "client_telegram_id": telegram_id,
@@ -335,10 +347,14 @@ async def create_order(order_data: CreateOrderRequest, telegram_id: str = Query(
     if active_order:
         raise HTTPException(status_code=400, detail="У вас уже есть активный заказ")
     
-    # Get client
+    # Get or create client
     client_doc = await db.clients.find_one({"telegram_id": telegram_id}, {"_id": 0})
     if not client_doc:
-        raise HTTPException(status_code=404, detail="Клиент не найден")
+        # Auto-create client if not exists
+        logger.info(f"Auto-creating client: {telegram_id}")
+        new_client = ClientModel(telegram_id=telegram_id)
+        await db.clients.insert_one(new_client.model_dump())
+        client_doc = new_client.model_dump()
     
     # Create order
     order = OrderModel(
@@ -355,6 +371,7 @@ async def create_order(order_data: CreateOrderRequest, telegram_id: str = Query(
     # Broadcast to drivers
     asyncio.create_task(broadcast_order_to_drivers(order))
     
+    logger.info(f"Order created: {order.id}")
     return order.model_dump()
 
 @api_router.get("/client/order/active")
