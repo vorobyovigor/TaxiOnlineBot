@@ -233,31 +233,30 @@ export default function AdminDrivers() {
                   className="flex-1"
                   onClick={() => {
                     setSelectedDriver(driver);
-                    setEditPhone(driver.phone || "");
+                    setEditForm({
+                      phone: driver.phone || "",
+                      car_brand: driver.car_brand || "",
+                      car_model: driver.car_model || "",
+                      car_color: driver.car_color || "",
+                      car_plate: driver.car_plate || ""
+                    });
                     setShowEditDialog(true);
                   }}
                   data-testid={`edit-driver-${driver.id}`}
                 >
                   <Edit2 className="w-4 h-4 mr-1" />
-                  Телефон
+                  Редактировать
                 </Button>
                 <Button
                   variant={driver.status === "ACTIVE" ? "destructive" : "default"}
                   size="sm"
-                  className="flex-1"
                   onClick={() => handleToggleStatus(driver)}
                   data-testid={`toggle-driver-${driver.id}`}
                 >
                   {driver.status === "ACTIVE" ? (
-                    <>
-                      <UserX className="w-4 h-4 mr-1" />
-                      Блок.
-                    </>
+                    <UserX className="w-4 h-4" />
                   ) : (
-                    <>
-                      <UserCheck className="w-4 h-4 mr-1" />
-                      Разбл.
-                    </>
+                    <UserCheck className="w-4 h-4" />
                   )}
                 </Button>
               </div>
