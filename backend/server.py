@@ -464,13 +464,9 @@ async def cancel_order(order_id: str, telegram_id: str = Query(...)):
     
     await log_action(ActionType.ORDER_CANCELLED, order_id=order_id, client_id=order["client_id"])
     
-    # Update message in drivers chat if exists
+    # Delete message from drivers chat if exists
     if order.get("telegram_message_id") and TELEGRAM_DRIVERS_CHAT_ID:
-        await edit_telegram_message(
-            TELEGRAM_DRIVERS_CHAT_ID,
-            order["telegram_message_id"],
-            f"❌ <b>Заказ отменён клиентом</b>\n\n🆔 Заказ: <code>{order_id[:8]}</code>"
-        )
+        await delete_telegram_message(TELEGRAM_DRIVERS_CHAT_ID, order["telegram_message_id"])
     
     return {"success": True, "message": "Заказ отменён"}
 
