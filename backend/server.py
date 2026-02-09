@@ -99,6 +99,7 @@ class OrderModel(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     client_id: str
     client_telegram_id: str
+    client_phone: Optional[str] = None  # Телефон клиента
     address_from: str
     address_to: str
     comment: Optional[str] = None
