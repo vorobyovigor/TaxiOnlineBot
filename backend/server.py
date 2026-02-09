@@ -273,6 +273,9 @@ async def broadcast_order_to_drivers(order: OrderModel):
     if order.comment:
         text += f"💬 <b>Комментарий:</b> {order.comment}\n"
     
+    if order.client_phone:
+        text += f"📞 <b>Телефон клиента:</b> {order.client_phone}\n"
+    
     text += f"\n🆔 Заказ: <code>{order.id[:8]}</code>"
     
     reply_markup = {
