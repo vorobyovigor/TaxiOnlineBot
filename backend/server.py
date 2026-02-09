@@ -1205,6 +1205,66 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# ==================== BACKGROUND TASKS ====================
+
+ORDER_TIMEOUT_MINUTES = 15  # Время ожидания заказа в минутах
+
+async def cancel_expired_orders():
+    """Background task to cancel orders that have been waiting too long"""
+    while True:
+        try:
+            # Находим заказы старше 15 минут со статусом NEW или BROADCAST
+            cutoff_time = datetime.now(timezone.utc) - timedelta(minutes=ORDER_TIMEOUT_MINUTES)
+            cutoff_time_str = cutoff_time.isoformat()
+            
+            expired_orders = await db.orders.find({
+                "status": {"$in": [OrderStatus.NEW, OrderStatus.BROADCAST]},
+                "created_at": {"$lt": cutoff_time_str}
+            }, {"_id": 0}).to_list(100)
+            
+            for order in expired_orders:
+                logger.info(f"Auto-cancelling expired order: {order['id']}")
+                
+                # Отменяем заказ
+                await db.orders.update_one(
+                    {"id": order["id"]},
+                    {"$set": {
+                        "status": OrderStatus.CANCELLED,
+                        "cancelled_at": datetime.now(timezone.utc).isoformat()
+                    }}
+                )
+                
+                # Удаляем сообщение из группы водителей
+                if order.get("telegram_message_id") and TELEGRAM_DRIVERS_CHAT_ID:
+                    await delete_telegram_message(TELEGRAM_DRIVERS_CHAT_ID, order["telegram_message_id"])
+                
+                # Отправляем уведомление клиенту
+                await notify_client(
+                    order["client_telegram_id"],
+                    "😔 <b>Извините, автомобиль не найден.</b>\n\nПопробуйте предложить выше цену."
+                )
+                
+                await log_action(
+                    ActionType.ORDER_CANCELLED, 
+                    order_id=order["id"], 
+                    details="Автоматическая отмена: истекло время ожидания (15 минут)"
+                )
+            
+            if expired_orders:
+                logger.info(f"Auto-cancelled {len(expired_orders)} expired orders")
+                
+        except Exception as e:
+            logger.error(f"Error in cancel_expired_orders task: {e}")
+        
+        # Проверяем каждую минуту
+        await asyncio.sleep(60)
+
+@app.on_event("startup")
+async def startup_event():
+    """Start background tasks on app startup"""
+    asyncio.create_task(cancel_expired_orders())
+    logger.info("Background task for auto-cancelling expired orders started")
+
 @app.on_event("shutdown")
 async def shutdown_db_client():
     client.close()
