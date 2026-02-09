@@ -57,41 +57,55 @@ export default function MiniApp() {
       if (tg?.initDataUnsafe?.user?.id) {
         telegramId = String(tg.initDataUnsafe.user.id);
         
-        // Auth with backend
+        // Try to auth with backend
         try {
           const authRes = await axios.post(`${API}/client/auth`, {
             init_data: tg.initData || ""
           });
           userData = authRes.data;
-          
-          // Check if phone is required
-          if (!userData.phone) {
-            setNeedsPhone(true);
-            setUser(userData);
-            setLoading(false);
-            return;
-          }
         } catch (authError) {
           console.error("Auth error:", authError);
-          // Use data from Telegram directly - but require phone
+          // Create user data from Telegram
           userData = {
             telegram_id: telegramId,
             first_name: tg.initDataUnsafe.user.first_name,
             last_name: tg.initDataUnsafe.user.last_name,
             username: tg.initDataUnsafe.user.username
           };
+        }
+        
+        // Always check if phone exists via separate endpoint
+        try {
+          const checkRes = await axios.get(`${API}/client/check-phone`, {
+            params: { telegram_id: telegramId }
+          });
+          
+          if (!checkRes.data.has_phone) {
+            setNeedsPhone(true);
+            setUser({ ...userData, telegram_id: telegramId });
+            setLoading(false);
+            return;
+          }
+          
+          // Update userData with phone if available
+          if (checkRes.data.phone) {
+            userData.phone = checkRes.data.phone;
+          }
+        } catch (e) {
+          // If check fails, require phone
           setNeedsPhone(true);
-          setUser(userData);
+          setUser({ ...userData, telegram_id: telegramId });
           setLoading(false);
           return;
         }
+        
       } else {
         // Demo mode for testing outside Telegram
         telegramId = "demo_user_123";
         userData = { telegram_id: telegramId, first_name: "Demo User", phone: "+7 999 123 4567" };
       }
       
-      setUser(userData);
+      setUser({ ...userData, telegram_id: telegramId });
       setNeedsPhone(false);
       
       // Fetch active order
