@@ -70,15 +70,21 @@ export default function AdminDrivers() {
     }
   };
 
-  const handleUpdatePhone = async () => {
+  const handleUpdateDriver = async () => {
     if (!selectedDriver) return;
     
     try {
-      await axios.patch(`${API}/admin/drivers/${selectedDriver.id}`, {
-        phone: editPhone.trim() || null
-      });
+      const updateData = {
+        phone: editForm.phone.trim() || null,
+        car_brand: editForm.car_brand.trim() || null,
+        car_model: editForm.car_model.trim() || null,
+        car_color: editForm.car_color.trim() || null,
+        car_plate: editForm.car_plate.trim().toUpperCase() || null
+      };
       
-      toast.success("Телефон обновлён");
+      await axios.patch(`${API}/admin/drivers/${selectedDriver.id}`, updateData);
+      
+      toast.success("Профиль водителя обновлён");
       setShowEditDialog(false);
       fetchDrivers();
     } catch (error) {
