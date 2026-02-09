@@ -100,6 +100,7 @@ class OrderModel(BaseModel):
     client_id: str
     client_telegram_id: str
     client_phone: Optional[str] = None  # Телефон клиента
+    client_price: int = 0  # Цена клиента
     address_from: str
     address_to: str
     comment: Optional[str] = None
