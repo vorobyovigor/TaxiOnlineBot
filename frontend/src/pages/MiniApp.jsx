@@ -291,6 +291,57 @@ export default function MiniApp() {
     );
   }
 
+  // Phone request screen
+  if (needsPhone) {
+    return (
+      <div className="min-h-screen bg-[#0f0f0f] text-white flex flex-col" data-testid="phone-request-screen">
+        {/* Background */}
+        <div className="absolute inset-0 map-placeholder opacity-40" />
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[#0f0f0f]" />
+        
+        <div className="relative z-10 flex-1 flex flex-col items-center justify-center p-6">
+          <div className="bg-[#1c1c1e] rounded-2xl p-8 max-w-sm w-full border border-white/5 text-center">
+            {/* Icon */}
+            <div className="w-20 h-20 rounded-full bg-[#2AABEE]/20 flex items-center justify-center mx-auto mb-6">
+              <Smartphone className="w-10 h-10 text-[#2AABEE]" />
+            </div>
+            
+            {/* Title */}
+            <h1 className="text-xl font-bold mb-2">Нужен номер телефона</h1>
+            <p className="text-white/60 text-sm mb-6">
+              Для оформления заказа такси необходимо предоставить ваш номер телефона. 
+              Водитель сможет связаться с вами при необходимости.
+            </p>
+            
+            {/* Request button */}
+            <Button
+              onClick={requestPhone}
+              disabled={requestingPhone}
+              className="w-full h-12 rounded-xl bg-[#2AABEE] hover:bg-[#229ED9] text-white font-semibold shadow-lg shadow-[#2AABEE]/20 active:scale-95 transition-all"
+              data-testid="request-phone-btn"
+            >
+              {requestingPhone ? (
+                <>
+                  <Loader2 className="w-5 h-5 animate-spin mr-2" />
+                  Запрос...
+                </>
+              ) : (
+                <>
+                  <Phone className="w-5 h-5 mr-2" />
+                  Предоставить номер телефона
+                </>
+              )}
+            </Button>
+            
+            <p className="text-white/40 text-xs mt-4">
+              Нажмите кнопку и подтвердите отправку номера в Telegram
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-[#0f0f0f] text-white flex flex-col" data-testid="mini-app-container">
       {/* Map placeholder background */}
