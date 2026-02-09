@@ -512,20 +512,44 @@ async def telegram_webhook(request: Request):
         if callback_data.startswith("accept_order:"):
             order_id = callback_data.split(":")[1]
             
-            # Check if driver exists and is active
+            # Check if driver exists
             driver = await db.drivers.find_one({"telegram_id": telegram_id}, {"_id": 0})
             
             if not driver:
-                # Auto-register driver
+                # Create new driver and start registration
                 driver = DriverModel(
                     telegram_id=telegram_id,
                     username=user.get("username"),
                     first_name=user.get("first_name"),
-                    last_name=user.get("last_name")
+                    last_name=user.get("last_name"),
+                    is_registered=False,
+                    registration_step="car_brand"
                 )
                 await db.drivers.insert_one(driver.model_dump())
-                driver = driver.model_dump()
-                await log_action(ActionType.DRIVER_REGISTERED, driver_id=driver["id"])
+                
+                await answer_callback_query(callback_id, "Сначала нужно зарегистрироваться!", True)
+                await send_telegram_message(
+                    telegram_id,
+                    "🚕 Добро пожаловать в команду водителей!\n\n"
+                    "Для начала работы заполните данные об автомобиле.\n\n"
+                    "🚗 Введите марку автомобиля (например: Toyota, Hyundai, Kia):"
+                )
+                return {"ok": True}
+            
+            if not driver.get("is_registered"):
+                # Driver exists but not fully registered
+                if not driver.get("registration_step"):
+                    await db.drivers.update_one(
+                        {"telegram_id": telegram_id},
+                        {"$set": {"registration_step": "car_brand"}}
+                    )
+                    await send_telegram_message(
+                        telegram_id,
+                        "🚗 Продолжите регистрацию. Введите марку автомобиля:"
+                    )
+                
+                await answer_callback_query(callback_id, "Сначала завершите регистрацию в личных сообщениях бота!", True)
+                return {"ok": True}
             
             if driver["status"] == DriverStatus.BLOCKED:
                 await answer_callback_query(callback_id, "Вы заблокированы", True)
