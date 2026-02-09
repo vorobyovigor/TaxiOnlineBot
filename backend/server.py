@@ -799,18 +799,19 @@ async def telegram_webhook(request: Request):
             
             await answer_callback_query(callback_id, "✅ Вы приняли заказ!")
             
-            # Send order details to driver in private
+            # Send order details to driver in private with client phone
             client_phone = order.get("client_phone", "")
+            client_price = order.get("client_price", 0)
             driver_message = f"""🚖 <b>Вы приняли заказ!</b>
 
 📍 <b>Откуда:</b> {order['address_from']}
-📍 <b>Куда:</b> {order['address_to']}"""
+📍 <b>Куда:</b> {order['address_to']}
+💰 <b>Цена клиента:</b> {client_price} ₽"""
             if order.get("comment"):
                 driver_message += f"\n💬 <b>Комментарий:</b> {order['comment']}"
-            if client_phone:
-                driver_message += f"\n📞 <b>Телефон клиента:</b> {client_phone}"
             
-            driver_message += f"\n\n🆔 Заказ: <code>{order_id[:8]}</code>"
+            driver_message += f"\n\n📞 <b>Телефон клиента:</b> {client_phone if client_phone else 'не указан'}"
+            driver_message += f"\n🆔 Заказ: <code>{order_id[:8]}</code>"
             
             await send_telegram_message(telegram_id, driver_message, {
                 "inline_keyboard": [[
