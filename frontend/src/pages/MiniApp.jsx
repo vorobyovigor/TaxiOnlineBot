@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import axios from "axios";
-import { MapPin, Navigation, MessageSquare, X, Clock, User, Phone, Loader2, CheckCircle, AlertCircle } from "lucide-react";
+import { MapPin, Navigation, MessageSquare, X, Clock, User, Phone, Loader2, CheckCircle, AlertCircle, Smartphone } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -23,10 +23,12 @@ const tg = window.Telegram?.WebApp;
 
 export default function MiniApp() {
   const [user, setUser] = useState(null);
+  const [needsPhone, setNeedsPhone] = useState(false);
   const [activeOrder, setActiveOrder] = useState(null);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [showCancelDialog, setShowCancelDialog] = useState(false);
+  const [requestingPhone, setRequestingPhone] = useState(false);
   
   // Form state
   const [addressFrom, setAddressFrom] = useState("");
