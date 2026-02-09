@@ -596,6 +596,8 @@ async def telegram_webhook(request: Request):
             
             # Update message in chat
             order = result
+            car_info = f"{driver.get('car_brand', '')} {driver.get('car_model', '')} {driver.get('car_color', '')} ({driver.get('car_plate', '')})".strip()
+            
             await edit_telegram_message(
                 TELEGRAM_DRIVERS_CHAT_ID,
                 order.get("telegram_message_id"),
@@ -604,15 +606,16 @@ async def telegram_webhook(request: Request):
 📍 <b>Откуда:</b> {order['address_from']}
 📍 <b>Куда:</b> {order['address_to']}
 
-👤 <b>Водитель:</b> {order.get('driver_name', 'Не указано')}
+👤 <b>Водитель:</b> {driver_name}
+🚗 <b>Авто:</b> {car_info}
 🆔 Заказ: <code>{order_id[:8]}</code>"""
             )
             
-            # Notify client
-            driver_name = f"{driver.get('first_name', '')} {driver.get('last_name', '')}".strip() or driver.get("username", "Водитель")
+            # Notify client with car info
             client_message = f"""🚖 <b>Водитель назначен!</b>
 
-👤 <b>Водитель:</b> {driver_name}"""
+👤 <b>Водитель:</b> {driver_name}
+🚗 <b>Автомобиль:</b> {car_info}"""
             if driver.get("phone"):
                 client_message += f"\n📞 <b>Телефон:</b> {driver['phone']}"
             
