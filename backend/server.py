@@ -933,12 +933,13 @@ async def get_driver_details(driver_id: str):
 
 @api_router.patch("/admin/drivers/{driver_id}")
 async def update_driver(driver_id: str, data: UpdateDriverRequest):
-    """Update driver status or phone"""
+    """Update driver status, phone or car info"""
     driver = await db.drivers.find_one({"id": driver_id}, {"_id": 0})
     if not driver:
         raise HTTPException(status_code=404, detail="Водитель не найден")
     
     update_dict = {}
+    
     if data.status:
         update_dict["status"] = data.status
         if data.status == DriverStatus.BLOCKED:
@@ -946,11 +947,35 @@ async def update_driver(driver_id: str, data: UpdateDriverRequest):
         else:
             await log_action(ActionType.DRIVER_UNBLOCKED, driver_id=driver_id)
     
-    if data.phone:
-        update_dict["phone"] = data.phone
+    if data.phone is not None:
+        update_dict["phone"] = data.phone if data.phone else None
     
+    if data.car_brand is not None:
+        update_dict["car_brand"] = data.car_brand if data.car_brand else None
+    
+    if data.car_model is not None:
+        update_dict["car_model"] = data.car_model if data.car_model else None
+    
+    if data.car_color is not None:
+        update_dict["car_color"] = data.car_color if data.car_color else None
+    
+    if data.car_plate is not None:
+        update_dict["car_plate"] = data.car_plate.upper() if data.car_plate else None
+    
+    # Check if all car fields are filled - mark as registered
     if update_dict:
         await db.drivers.update_one({"id": driver_id}, {"$set": update_dict})
+        
+        # Check if driver is now fully registered
+        updated_driver = await db.drivers.find_one({"id": driver_id}, {"_id": 0})
+        if (updated_driver.get("car_brand") and updated_driver.get("car_model") and 
+            updated_driver.get("car_color") and updated_driver.get("car_plate")):
+            await db.drivers.update_one(
+                {"id": driver_id}, 
+                {"$set": {"is_registered": True, "registration_step": None}}
+            )
+            if not driver.get("is_registered"):
+                await log_action(ActionType.DRIVER_REGISTERED, driver_id=driver_id, details="Зарегистрирован администратором")
     
     updated = await db.drivers.find_one({"id": driver_id}, {"_id": 0})
     return updated
