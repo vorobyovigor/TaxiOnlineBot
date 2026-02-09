@@ -303,6 +303,9 @@ export default function MiniApp() {
                     </div>
                     <div className="flex-1">
                       <p className="font-semibold">{activeOrder.driver_name}</p>
+                      {activeOrder.driver_car && (
+                        <p className="text-sm text-white/60 mt-0.5">🚗 {activeOrder.driver_car}</p>
+                      )}
                       {activeOrder.driver_phone && (
                         <a 
                           href={`tel:${activeOrder.driver_phone}`}
