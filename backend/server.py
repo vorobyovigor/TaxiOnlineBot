@@ -617,7 +617,7 @@ async def telegram_webhook(request: Request):
             "inline_keyboard": [[
                 {
                     "text": "🚖 Заказать такси",
-                    "web_app": {"url": os.environ.get("WEBAPP_URL", "https://brief-specs-1.preview.emergentagent.com")}
+                    "web_app": {"url": os.environ.get("WEBAPP_URL", "https://teleport-taxi.preview.emergentagent.com")}
                 }
             ]]
         }

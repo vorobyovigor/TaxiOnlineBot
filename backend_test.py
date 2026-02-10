@@ -11,7 +11,7 @@ from datetime import datetime
 from typing import Dict, Any, Optional
 
 class TaxiAPITester:
-    def __init__(self, base_url="https://brief-specs-1.preview.emergentagent.com"):
+    def __init__(self, base_url="https://teleport-taxi.preview.emergentagent.com"):
         self.base_url = base_url
         self.api_url = f"{base_url}/api"
         self.admin_token = None

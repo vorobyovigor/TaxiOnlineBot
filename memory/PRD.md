@@ -1,90 +1,138 @@
-# PRD: Telegram Mini App «Служба такси» — MVP
+# Telegram Taxi Mini App - PRD
 
-## Оригинальное ТЗ
-Создание минимально жизнеспособного сервиса такси (MVP) для одного города, работающего внутри Telegram, с приёмом заказов через Mini App, распределением заказов через чат водителей и управлением через веб-админку.
+## Описание проекта
+Telegram Mini App для службы такси с функционалом для клиентов, водителей и администраторов.
 
-## Технологический стек
-- **Backend:** Python FastAPI + MongoDB
-- **Frontend:** React 19 + Tailwind CSS + shadcn/ui
-- **Telegram Integration:** python-telegram-bot + Webhook API
+## Статус: ✅ РАЗВЁРНУТО И РАБОТАЕТ
 
-## Роли пользователей
-1. **Клиент** — пользователь Telegram, оформляет заказы через Mini App
-2. **Водитель** — получает заказы в чате, принимает через inline-кнопки
-3. **Администратор** — управляет через веб-админку
+**Дата развёртывания:** 10 февраля 2026
+**Домен:** https://taxi.tehnology.com.ru
+**Админ-панель:** https://taxi.tehnology.com.ru/admin
 
-## Статусы заказа
-- NEW → BROADCAST → ASSIGNED → COMPLETED
-- NEW/BROADCAST → CANCELLED
+---
 
-## Реализованные функции (08.02.2026)
+## Реализованный функционал
 
-### Mini App (Клиент)
-- [x] Форма создания заказа (Откуда, Куда, Комментарий)
-- [x] Просмотр статуса активного заказа
-- [x] Отмена заказа с подтверждением
-- [x] Информация о назначенном водителе (имя, телефон)
-- [x] Polling обновлений статуса
+### Клиентская часть (Telegram Mini App)
+- ✅ Авторизация через Telegram аккаунт
+- ✅ Верификация номера телефона через Telegram
+- ✅ Создание заказа (адреса откуда/куда, комментарий)
+- ✅ Указание цены за поездку (обязательное поле)
+- ✅ Просмотр статуса активного заказа
+- ✅ Отмена заказа
+- ✅ Получение информации о водителе (имя, машина, телефон)
+- ✅ Автоматическая отмена заказа через 15 минут без водителя
 
-### Telegram Bot
-- [x] Рассылка заказов в чат водителей
-- [x] Inline-кнопка "Принять заказ"
-- [x] Anti-race защита при назначении
-- [x] Автоматическая регистрация водителей
-- [x] Кнопка завершения заказа для водителя
-- [x] Уведомления клиенту о статусе
+### Функционал водителей
+- ✅ Автоматическая регистрация при вступлении в группу водителей
+- ✅ Заполнение данных автомобиля (марка, модель, цвет, номер)
+- ✅ Получение новых заказов в группу (без телефона клиента)
+- ✅ Принятие заказа кнопкой
+- ✅ Получение полной информации о заказе в личные сообщения
+- ✅ Удаление заказа из группы после принятия
 
-### Админ-панель
-- [x] Авторизация через Telegram ID
-- [x] Дашборд со статистикой
-- [x] Управление заказами (просмотр, фильтры, отмена, назначение)
-- [x] Управление водителями (блокировка, телефон)
-- [x] Просмотр клиентов
-- [x] Логи действий
-- [x] Настройки (Chat ID водителей, Webhook URL)
+### Админ-панель (Web)
+- ✅ Авторизация по Telegram ID
+- ✅ Управление заказами
+- ✅ Управление водителями (редактирование профилей)
+- ✅ Управление клиентами
+- ✅ Просмотр логов действий
 
-### Backend API
-- [x] /api/client/auth — авторизация клиента
-- [x] /api/client/order — CRUD заказов клиента
-- [x] /api/admin/auth — авторизация админа
-- [x] /api/admin/orders — управление заказами
-- [x] /api/admin/drivers — управление водителями
-- [x] /api/admin/clients — список клиентов
-- [x] /api/admin/logs — логи действий
-- [x] /api/admin/stats — статистика
-- [x] /api/telegram/webhook — webhook для бота
+---
 
-## Ограничения MVP (не реализовано)
-- Онлайн-оплата
-- Карты и геолокация
-- Автоназначение
-- Несколько городов
-- Рейтинги и аналитика
+## Техническая архитектура
 
-## Настройка для работы
+### Сервер пользователя
+- **Домен:** taxi.tehnology.com.ru
+- **MongoDB:** Docker контейнер (mongo:4.4)
+- **Backend:** Docker контейнер (FastAPI)
+- **Frontend:** Docker контейнер (React + Nginx)
+- **SSL:** Let's Encrypt
 
-### 1. Telegram Bot Token
-Уже настроен в /app/backend/.env
+### Стек технологий
+- **Backend:** FastAPI, Motor (async MongoDB), python-telegram-bot
+- **Frontend:** React, Tailwind CSS, Telegram Mini App SDK
+- **Database:** MongoDB 4.4
+- **Deployment:** Docker, Docker Compose, Nginx
 
-### 2. Chat ID водителей
-1. Создайте группу в Telegram
-2. Добавьте бота в группу (дайте права админа)
-3. Узнайте Chat ID через @RawDataBot
-4. Введите Chat ID в Настройках админки
-
-### 3. Установка Webhook
-```bash
-curl -X POST "https://api.telegram.org/bot{TOKEN}/setWebhook?url={BACKEND_URL}/api/telegram/webhook"
+### Ключевые переменные окружения
+```
+TELEGRAM_BOT_TOKEN=***
+TELEGRAM_DRIVERS_CHAT_ID=-1002026151302
+MONGO_URL=mongodb://172.17.0.1:27017
+DB_NAME=taxi_bot
+ADMIN_TELEGRAM_IDS=1224747615
+WEBAPP_URL=https://taxi.tehnology.com.ru
 ```
 
-## Backlog (P1/P2)
-- P1: Интеграция с реальным Telegram Login Widget
-- P1: История поездок клиента с деталями
-- P2: Push-уведомления
-- P2: Расчёт стоимости поездки
-- P2: Интеграция карт (Яндекс/Google)
+---
 
-## Следующие шаги
-1. Настроить webhook для Telegram бота
-2. Создать группу водителей и указать Chat ID
-3. Протестировать полный цикл заказа
+## Конфигурация
+
+### Telegram Bot
+- **Webhook:** https://taxi.tehnology.com.ru/api/telegram/webhook
+- **Mini App URL:** https://taxi.tehnology.com.ru
+
+### Администраторы
+- Telegram ID: 1224747615
+
+### Группа водителей
+- Chat ID: -1002026151302
+
+---
+
+## Файловая структура на сервере
+```
+/var/www/taxi/
+├── backend/
+│   ├── server.py
+│   ├── requirements.txt
+│   ├── .env
+│   └── Dockerfile
+├── frontend/
+│   ├── src/
+│   ├── public/
+│   ├── .env
+│   ├── Dockerfile
+│   └── nginx.conf
+├── docker-compose.yml
+├── DEPLOY_FULL.md
+└── nginx.conf
+```
+
+---
+
+## Команды управления
+
+### Docker
+```bash
+# Статус контейнеров
+docker ps
+
+# Логи backend
+docker logs taxi-backend --tail 50
+
+# Перезапуск
+cd /var/www/taxi && docker-compose restart
+
+# Пересборка
+cd /var/www/taxi && docker-compose down && docker-compose up -d --build
+```
+
+### Telegram Webhook
+```bash
+# Проверка webhook
+curl "https://api.telegram.org/bot<TOKEN>/getWebhookInfo"
+
+# Установка webhook
+curl "https://api.telegram.org/bot<TOKEN>/setWebhook?url=https://taxi.tehnology.com.ru/api/telegram/webhook"
+```
+
+---
+
+## Будущие улучшения (Backlog)
+- [ ] История заказов для клиентов
+- [ ] Рейтинг водителей
+- [ ] Интеграция с картами для расчёта маршрута
+- [ ] Push-уведомления
+- [ ] Статистика для админов
